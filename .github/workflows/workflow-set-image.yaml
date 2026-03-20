@@ -30,7 +30,7 @@ jobs:
       - name: Set SHA to image digest
         run: |
           cd manifests
-          sed -i "s|^\(\s*digest:\s*\).*|\1\"$TAG\"|" image.cue
+          sed -i "s|^\(\s*digest:\s*\).*|\1\"${GITHUB_SHA::7}\"|" image.cue
           echo "After update:"
           cat image.cue
 
