@@ -26,12 +26,7 @@ jobs:
           token: ${{ secrets.MANIFEST_REPO_TOKEN }}
           path: manifests
           persist-credentials: false
-          ref: prod
-
-      - name: Create prod branch if it doesn't exist
-        run: |
-          cd manifests
-          git fetch origin main:prod 2>/dev/null || git checkout -b prod
+          # ref: prod
 
       - name: Set SHA to image digest
         run: |
