@@ -26,6 +26,7 @@ jobs:
           token: ${{ secrets.MANIFEST_REPO_TOKEN }}
           path: manifests
           persist-credentials: false
+          ref: prod
 
       - name: Set SHA to image digest
         run: |
