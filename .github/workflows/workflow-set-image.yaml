@@ -28,10 +28,16 @@ jobs:
           persist-credentials: false
           ref: prod
 
+      - name: Create prod branch if it doesn't exist
+        run: |
+          cd manifests
+          git fetch origin main:prod 2>/dev/null || git checkout -b prod
+
       - name: Set SHA to image digest
         run: |
           ls */*/*
           cd manifests
+          git checkout prod
           yq e -n '.values.image.digest = "${{ steps.vars.outputs.TAG }}"' > timoni/image-SHA-value.yaml
 
       - name: Commit and push changes
@@ -45,4 +51,4 @@ jobs:
 
           # Ensure push uses the PAT provided in the secret
           git remote set-url origin https://x-access-token:${{ secrets.MANIFEST_REPO_TOKEN }}@github.com/HarshPanchal18/timoni-manifest.git
-          git push origin HEAD:main
+          git push origin HEAD:prod
