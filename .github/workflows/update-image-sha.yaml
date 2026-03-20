@@ -1,0 +1,46 @@
+name: Build and Update Manifest Repo
+
+on:
+  push:
+    branches: [ "dev" ]
+
+jobs:
+  build-and-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        id: vars
+        run: |
+          echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+          echo "${GITHUB_SHA::7}"
+
+      # ---- Checkout manifest repo ----
+      - name: Checkout manifest repo
+        uses: actions/checkout@v4
+        with:
+          repository: HarshPanchal18/timoni-manifest
+          token: ${{ secrets.MANIFEST_REPO_TOKEN }}
+          path: manifests
+          persist-credentials: false
+
+      - name: Set SHA to image digest
+        run: |
+          cd manifests
+          yq e -n '.values.image.digest = "${{ steps.vars.outputs.TAG }}"' > timoni/image-SHA-value.yaml
+
+      - name: Commit and push changes
+        run: |
+          cd manifests
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add .
+          git commit -m "chore: update nginx image to ${{ steps.vars.outputs.TAG }}" || echo "no changes to commit"
+
+          # Ensure push uses the PAT provided in the secret
+          git remote set-url origin https://x-access-token:${{ secrets.MANIFEST_REPO_TOKEN }}@github.com/HarshPanchal18/timoni-manifest.git
+          git push origin HEAD:dev
