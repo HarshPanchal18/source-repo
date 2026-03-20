@@ -42,9 +42,10 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
+          git pull origin ${{ github.ref_name }}
           git add .
           git commit -m "chore: update nginx image to ${{ steps.vars.outputs.TAG }}" || echo "no changes to commit"
 
           # Ensure push uses the PAT provided in the secret
           git remote set-url origin https://x-access-token:${{ secrets.MANIFEST_REPO_TOKEN }}@github.com/HarshPanchal18/timoni-manifest.git
-          git push origin HEAD:dev
+          git push origin HEAD:${{ github.ref_name }}
