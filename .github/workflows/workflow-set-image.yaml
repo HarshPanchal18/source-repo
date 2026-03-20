@@ -30,9 +30,10 @@ jobs:
 
       - name: Set SHA to image digest
         run: |
-          ls */*/*
+          # ls */*/*
+          git branch
+          # git checkout prod
           cd manifests
-          git checkout prod
           yq e -n '.values.image.digest = "${{ steps.vars.outputs.TAG }}"' > timoni/image-SHA-value.yaml
 
       - name: Commit and push changes
