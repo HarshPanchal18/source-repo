@@ -22,19 +22,19 @@ jobs:
       - name: Checkout manifest repo
         uses: actions/checkout@v4
         with:
-          repository: HarshPanchal18/timoni-manifest
+          repository: HarshPanchal18/timoni-sample-app
           token: ${{ secrets.MANIFEST_REPO_TOKEN }}
           path: manifests
           persist-credentials: false
-          # ref: prod
 
       - name: Set SHA to image digest
         run: |
-          # ls */*/*
-          git branch
-          # git checkout prod
           cd manifests
-          yq e -n '.values.image.digest = "${{ steps.vars.outputs.TAG }}"' > timoni/image-SHA-value.yaml
+          # IMAGE_TAG=${{ github.sha }}
+          # sed -i "s/tag:[[:space:]]*\".*\"/digest:        \"$TAG\"/" image.cue
+          sed -i 's/digest: ".*"/digest: "$TAG"/' image.cue
+          echo "After update:"
+          cat image.cue
 
       - name: Commit and push changes
         run: |
@@ -42,9 +42,10 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
+          # git pull origin ${{ github.ref_name }}
           git add .
           git commit -m "chore: update nginx image to ${{ steps.vars.outputs.TAG }}" || echo "no changes to commit"
 
           # Ensure push uses the PAT provided in the secret
           git remote set-url origin https://x-access-token:${{ secrets.MANIFEST_REPO_TOKEN }}@github.com/HarshPanchal18/timoni-manifest.git
-          git push origin HEAD:prod
+          git push origin HEAD:${{ github.ref_name }}
