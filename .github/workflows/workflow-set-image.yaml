@@ -30,9 +30,7 @@ jobs:
       - name: Set SHA to image digest
         run: |
           cd manifests
-          # IMAGE_TAG=${{ github.sha }}
-          # sed -i "s/tag:[[:space:]]*\".*\"/digest:        \"$TAG\"/" image.cue
-          sed -i 's/digest: ".*"/digest: "$TAG"/' image.cue
+          sed -i "s|^\(\s*digest:\s*\).*|\1\"$TAG\"|" image.cue
           echo "After update:"
           cat image.cue
 
