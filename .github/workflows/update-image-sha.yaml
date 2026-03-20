@@ -22,7 +22,7 @@ jobs:
       - name: Checkout manifest repo
         uses: actions/checkout@v4
         with:
-          repository: HarshPanchal18/timoni-manifest
+          repository: HarshPanchal18/timoni-sample-app
           token: ${{ secrets.MANIFEST_REPO_TOKEN }}
           path: manifests
           persist-credentials: false
@@ -30,7 +30,11 @@ jobs:
       - name: Set SHA to image digest
         run: |
           cd manifests
-          yq e -n '.values.image.digest = "${{ steps.vars.outputs.TAG }}"' > timoni/image-SHA-value.yaml
+          # IMAGE_TAG=${{ github.sha }}
+          # sed -i "s/tag:[[:space:]]*\".*\"/digest:        \"$TAG\"/" image.cue
+          sed -i 's/digest: ".*"/digest: "$TAG"/' image.cue
+          echo "After update:"
+          cat image.cue
 
       - name: Commit and push changes
         run: |
